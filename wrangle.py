@@ -1,5 +1,6 @@
 from env import get_connection
 from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import MinMaxScaler, StandardScaler, RobustScaler
 import pandas as pd
 import os
 
@@ -22,7 +23,7 @@ def zillow_data():
  the function will use a SQL query to retrieve the data and then save a local copy of zillow.csv.'''
 
 
-def wrangle_zillow():
+def wrangle_zillow(new_fips=False):
     zil = zillow_data()  # Retriesves data and assigs it to variable within function
     zil = zil[zil.bedroomcnt.isna() != True]  # Drops bedroom count values that are null
     zil = zil[zil.taxvaluedollarcnt.isna() != True]  # Drops taxvaluedollarcnt values that are null
@@ -36,8 +37,14 @@ def wrangle_zillow():
               'yearbuilt': 'year_built',
               'taxamount': 'tax_amount'}
     zil = zil.rename(columns=rename)  # Rename colums using dictionary
+    zil.year_built = zil.year_built.astype(int)
     zil.fips = zil.fips.astype(int)  # Convert fips to integer since it is not a decimal
     zil.bedrooms = zil.bedrooms.astype(int)  # Converts bedroom to integer since it is not a decimal
+    if new_fips:
+        fips_codes = {'6037': 'Los Angeles County',
+                      '6059': 'Orange County',
+                      '6111': 'Ventura County'}
+        zil.fips = [fips_codes.get(fip) for fip in zil.fips.astype(str)]
     return zil  # Return zil dataframe
 
 
@@ -60,3 +67,17 @@ def train_val_test(df, strat='None', seed=100, stratify=False):
 '''This function takes in a dataframe and splits the data into 3 separate dataframes containing 70%, 15% and 15% of 
 the original data. It is used to split our data into a train, test, and validate sample. It has an argument for
 stratify so you can choose if you want to stratify or not.'''
+
+
+def scale_zillow(df, method='mms'):
+    train, val, test = train_val_test(df)
+    scaled_cols = ['sq_ft', 'price', 'tax_amount']
+    if method == 'mms':
+        mms = MinMaxScaler()
+        mms.fit(train[scaled_cols])
+    if method == 'ss':
+        ss = StandardScaler()
+        ss.fit(train[scaled_cols])
+    if method == 'rs':
+        rs = RobustScaler()
+        rs.fit(train[scaled_cols])
