@@ -53,12 +53,12 @@ zillow data then drops all of the rows with null values. After dropping nulls, i
 zillow dataframe columns to something smaller and more concise. Then, it returns the clean dataframe.'''
 
 
-def train_val_test(df, strat='None', seed=100, stratify=False):
-    if stratify:
+def train_val_test(df, strat='None', seed=100, stratify=False):  # Splits dataframe into train, val, test
+    if stratify:  # Will split with stratify if stratify is True
         train, val_test = train_test_split(df, train_size=0.7, random_state=seed, stratify=df[strat])
         val, test = train_test_split(val_test, train_size=0.5, random_state=seed, stratify=val_test[strat])
         return train, val, test
-    if not stratify:
+    if not stratify:  # Will split without stratify if stratify is False
         train, val_test = train_test_split(df, train_size=0.7, random_state=seed)
         val, test = train_test_split(val_test, train_size=0.5, random_state=seed)
         return train, val, test
@@ -69,15 +69,34 @@ the original data. It is used to split our data into a train, test, and validate
 stratify so you can choose if you want to stratify or not.'''
 
 
-def scale_zillow(df, method='mms'):
-    train, val, test = train_val_test(df)
-    scaled_cols = ['sq_ft', 'price', 'tax_amount']
+def scale_zillow(df='?', train=None, val=None, test=None, method='mms', scaled_cols=None):
+    if train is None or val is None or test is None:
+        train, val, test = train_val_test(df)
+    if scaled_cols is None:
+        scaled_cols = ['sq_ft', 'price', 'tax_amount']
     if method == 'mms':
         mms = MinMaxScaler()
         mms.fit(train[scaled_cols])
+        train[scaled_cols] = mms.transform(train[scaled_cols])
+        val[scaled_cols] = mms.transform(val[scaled_cols])
+        test[scaled_cols] = mms.transform(test[scaled_cols])
+        return train, val, test
     if method == 'ss':
         ss = StandardScaler()
         ss.fit(train[scaled_cols])
+        train[scaled_cols] = ss.transform(train[scaled_cols])
+        val[scaled_cols] = ss.transform(val[scaled_cols])
+        test[scaled_cols] = ss.transform(test[scaled_cols])
+        return train, val, test
     if method == 'rs':
         rs = RobustScaler()
         rs.fit(train[scaled_cols])
+        train[scaled_cols] = rs.transform(train[scaled_cols])
+        val[scaled_cols] = rs.transform(val[scaled_cols])
+        test[scaled_cols] = rs.transform(test[scaled_cols])
+        return train, val, test
+
+
+'''This function scales zillow data. It takes in the zillow dataframe and splits it, or takes in the train, val, test
+ dataframes. It accepts a string input for which method the data will be scaled by. It fits the data on the train
+ dataframe then transforms all 3 dataframes.'''
