@@ -100,3 +100,16 @@ def scale_zillow(df='?', train=None, val=None, test=None, method='mms', scaled_c
 '''This function scales zillow data. It takes in the zillow dataframe and splits it, or takes in the train, val, test
  dataframes. It accepts a string input for which method the data will be scaled by. It fits the data on the train
  dataframe then transforms all 3 dataframes.'''
+
+
+def split_x_y(df, target=''):
+    x_df = df.drop(columns=target)
+    y_df = df[target]
+    return x_df, y_df
+
+
+def cheat_sheet():
+    print(f'Residual is the difference between the observed value and predicted values.')
+    print(f'SSE - Sum of the Squared Errors is the sum of the residuals squared.')
+    print(f'MSE - Mean Squared Error is the SSE divided by the total number of data points (len).')
+    print(f'RMSE - Root Mean Squared Error is the square root of the MSE.')
