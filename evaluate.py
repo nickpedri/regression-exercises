@@ -5,10 +5,9 @@ import matplotlib.pyplot as plt
 
 
 def plot_residuals(df, actual, model, hline=1_000):
-
     df['residuals'] = df[model] - df[actual]
     sns.scatterplot(data=df, x=actual, y='residuals')
-    plt.hlines(0, 0, hline, color='firebrick')
+    plt.hlines(0, 0, color='firebrick')
 
 
 def regression_errors(data, actual='', model=''):
@@ -22,11 +21,11 @@ def regression_errors(data, actual='', model=''):
     return SSE, ESS, TSS, MSE, RMSE
 
 
-def baseline(data, actual, method='mean'):
+def baseline(data, actual='', method='mean'):
     df = data.copy()
     if method == 'mean':
         df['baseline'] = df[actual].mean()
-    if method == 'mode':
+    if method == 'median':
         pass
     df['b_res'] = df['baseline'] - df[actual]
     SSE = (df['b_res'] ** 2).sum()
@@ -44,6 +43,6 @@ def compare_model_base(data, actual='', model='', baseline_model=''):
     print(f'The model SSE was {SSE}.')
     print(f'The baseline SSE was {SSE_baseline}.')
     if SSE < SSE_baseline:
-        print('The model did better.')
+        print(f'The model did better.')
     else:
-        print('The baseline did better.')
+        print(f'The baseline did better.')
