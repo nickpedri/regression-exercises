@@ -69,7 +69,7 @@ the original data. It is used to split our data into a train, test, and validate
 stratify so you can choose if you want to stratify or not.'''
 
 
-def scale_zillow(df='?', train=None, val=None, test=None, method='mms', scaled_cols=None):
+def scale(df='?', train=None, val=None, test=None, method='mms', scaled_cols=None):
     if train is None or val is None or test is None:
         train, val, test = train_val_test(df)
     if scaled_cols is None:
@@ -102,7 +102,7 @@ def scale_zillow(df='?', train=None, val=None, test=None, method='mms', scaled_c
  dataframe then transforms all 3 dataframes.'''
 
 
-def split_x_y(df, target=''):
+def split_xy(df, target=''):
     x_df = df.drop(columns=target)
     y_df = df[target]
     return x_df, y_df
